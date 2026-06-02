@@ -7,48 +7,59 @@ The system follows a complete robotics pipeline:
 
 ## 🎯 Key Features
 - ROS2 multi-node architecture
-- Event-driven system using publishers, subscribers, and timers
+- Event-driven ROS2 execution using publishers, subscribers, timers, and callbacks
 - Closed-loop feedback using actuator status and sensor verification
 - Retry logic with failure handling
 - Launch-based execution for full system orchestration
-- Topic-based simulation (no blocking input)
+
+## Engineering Motivation
+This project was built to practice ROS2 system architecture by implementing a complete sensing, supervisory, and actuation pipeline. Although inspired by an automated golf tee feeder, the architecture mirrors common robotics patterns used in industrial automation and autonomous systems.
+
+Many robotics systems must continuously monitor the environment, make decisions based on sensor input, and verify that actions were successfully executed.
 
 ## 🧠 System Architecture
-### Nodes
+## System Machine
+1. **Idle State**
+   - Ball is present on the tee
+ ↓
+2. **Detection**
+   - If ball is missing for 3 seconds → trigger feed
+ ↓
+3. **Actuation**
+   - Actuator simulates servo rotation (90°)
+   - Publishes `"DONE"` after completion
+ ↓
+4. **Verification**
+   - Supervisor waits for sensor confirmation
+   - If ball not detected → retry (max 3 attempts)
+ ↓
+5. **Failure Handling**
+   - After 3 failed attempts → system waits for manual intervention
 
+### Nodes
 |           Node           |                   Responsibility                    |
 |--------------------------|-----------------------------------------------------|
 | `tee_sensor_node`        | Publishes whether a ball is present on the tee      |
 | `feeder_supervisor_node` | State machine that decides when to feed             |
 | `actuator_node`          | Simulates servo-based feeder and reports completion |
 
-### Topics
+```text
+   tee_sensor_node
+         │
+         ▼
+   feeder_supervisor_node
+         │
+         ▼
+   actuator_node
+```
 
+### Topics
 |         Topic       |   Type   |              Description             |
 |---------------------|----------|--------------------------------------|
 | `/tee/ball_present` | `Bool`   | Sensor state (ball present or not)   |
 | `/feeder/command`   | `String` | Command to actuator (`FEED_ONE`)     |
 | `/feeder/status`    | `String` | Actuator feedback (`DONE`)           |
 | `/sim/toggle_ball`  | `Empty`  | Simulation trigger for ball state    |
-
-## 🔁 System Behavior
-
-1. **Idle State**
-   - Ball is present on the tee
-
-2. **Detection**
-   - If ball is missing for 3 seconds → trigger feed
-
-3. **Actuation**
-   - Actuator simulates servo rotation (90°)
-   - Publishes `"DONE"` after completion
-
-4. **Verification**
-   - Supervisor waits for sensor confirmation
-   - If ball not detected → retry (max 3 attempts)
-
-5. **Failure Handling**
-   - After 3 failed attempts → system waits for manual intervention
 
 ## 🚀 Running the System
 ### 1. Build
@@ -70,6 +81,16 @@ ros2 topic pub --once /sim/toggle_ball std_msgs/msg/Empty "{}"
 ```
 each time the ball presence state needs to be changed. (First call -> ball removed, second call -> ball placed)
 
+## Demo
+
+The image below shows the three ROS2 nodes running independently and communicating through topics.
+
+- Left: tee_sensor_node
+- Center: feeder_supervisor_node
+- Right: actuator_node
+
+![ROS2 Golf Ball Feeder Demo](screenshots/project_demo.png)
+
 ## 🛠 Technologies Used
 - ROS2 (rclpy)
 - Python
@@ -80,6 +101,12 @@ each time the ball presence state needs to be changed. (First call -> ball remov
 - Designed a modular ROS2 system with clear separation of concerns
 - Implemented closed-loop control using feedback and verification
 - Built a realistic failure-handling and retry mechanism
+
+## Lessons Learned
+- Designing state-machine logic is critical for reliable robotic behavior.
+- Feedback verification is more robust than assuming actuator commands always succeed.
+- ROS2 timers and callbacks enable responsive non-blocking system execution.
+- Modular node separation improves maintainability and testing.
 
 ## 📈 Future Improvements
 - Integrate real hardware (load cell + servo motor)

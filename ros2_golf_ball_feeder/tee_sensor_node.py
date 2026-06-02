@@ -1,4 +1,5 @@
 import rclpy
+import threading
 from rclpy.node import Node 
 # import threading
 from std_msgs.msg import Bool, Empty
@@ -21,8 +22,8 @@ class TeeSensorNode(Node):
 
         self.toggle_subscription = self.create_subscription(Empty, '/sim/toggle_ball', self.toggle_ball_callback, 10)
 
-        # self.input_thread = threading.Thread(target = self.keyboard_loop, daemon = True)
-        # self.input_thread.start()
+        self.input_thread = threading.Thread(target = self.keyboard_loop, daemon = True)
+        self.input_thread.start()
 
     def publish_ball_state(self):
         # published message: the ball presence status
@@ -52,17 +53,17 @@ class TeeSensorNode(Node):
         else:
             self.get_logger().info("Ball hit: tee is now empty")
 
-    # def keyboard_loop(self):
-    #     # keyboard input toggles the ball presence
-    #     while rclpy.ok():
-    #         input()
-    #         if self.ball_present == True:
-    #             self.ball_present = False
-    #             self.get_logger().info('Ball hit: tee is now empty')
+    def keyboard_loop(self):
+        # keyboard input toggles the ball presence
+        while rclpy.ok():
+            input()
+            if self.ball_present == True:
+                self.ball_present = False
+                self.get_logger().info('Ball hit: tee is now empty')
 
-    #         else:
-    #             self.ball_present = True
-    #             self.get_logger().info("Ball detected on the Tee")
+            else:
+                self.ball_present = True
+                self.get_logger().info("Ball detected on the Tee")
 
     
 def main(args = None):

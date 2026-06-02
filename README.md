@@ -46,11 +46,16 @@ Many robotics systems must continuously monitor the environment, make decisions 
 ```text
    tee_sensor_node
          │
+         │ ball_present
          ▼
    feeder_supervisor_node
          │
+         │ FEED_ONE
          ▼
    actuator_node
+         │
+         │ DONE
+         └───────────────► feeder_supervisor_node
 ```
 
 ### Topics
@@ -82,8 +87,8 @@ ros2 topic pub --once /sim/toggle_ball std_msgs/msg/Empty "{}"
 each time the ball presence state needs to be changed. (First call -> ball removed, second call -> ball placed)
 
 ## Demo
-
-The image below shows the three ROS2 nodes running independently and communicating through topics.
+The example below demonstrates a complete cycle:
+ball removed → supervisor detects absence → feed command issued → actuator responds → supervisor verifies ball placement.
 
 - Left: tee_sensor_node
 - Center: feeder_supervisor_node
@@ -101,6 +106,10 @@ The image below shows the three ROS2 nodes running independently and communicati
 - Designed a modular ROS2 system with clear separation of concerns
 - Implemented closed-loop control using feedback and verification
 - Built a realistic failure-handling and retry mechanism
+
+## Project Outcome
+- Successfully implemented a ROS2-based robotic automation system using a multi-node architecture, event-driven execution, supervisory state-machine logic, and feedback-based verification.
+- The project demonstrates a complete sense → decide → act pipeline commonly used in robotics and industrial automation systems.
 
 ## Lessons Learned
 - Designing state-machine logic is critical for reliable robotic behavior.

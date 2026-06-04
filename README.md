@@ -121,4 +121,3 @@ ball removed → supervisor detects absence → feed command issued → actuator
 - Integrate real hardware (load cell + servo motor)
 - Replace String messages with custom ROS2 message types
 - Add visualization (RViz or state topic)
-- Convert actuator node to C++ for performance realism

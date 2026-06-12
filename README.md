@@ -1,9 +1,22 @@
 # ROS2 Automated Golf Ball Tee Feeder
 
 ## 📌 Overview
-This project implements a **ROS2-based robotic system** that autonomously detects when a golf ball is missing from a tee and triggers a feeding mechanism to place a new ball.
+This project explores the design and implementation of an automated golf ball tee feeder, beginning with a ROS2-based software architecture and evolving into a physical ESP32-controlled prototype.
 The system follows a complete robotics pipeline:
 **Sense → Decide → Act → Verify**
+
+## Current Project Status
+This project began as a ROS2-based simulation used to develop and validate the sensing, supervisory, and actuation architecture of an automated golf ball feeder.
+
+The project has since evolved into a physical prototype consisting of:
+   - ESP32 microcontroller
+   - Microswitch-based tee sensor
+   - Servo-actuated feeder mechanism
+   - Mechanical golf ball hopper
+
+The current hardware prototype uses a tee-mounted microswitch to detect when a golf ball is removed from the tee, dispenses a replacement ball, verifies successful placement using sensor feedback, retries failed feed attempts up to three times, and enters a fault state requiring manual intervention if recovery is unsuccessful.
+
+The physical prototype implements the same feed, verification, retry, and fault-recovery logic originally developed in the ROS2 simulation.
 
 ## 🎯 Key Features
 - ROS2 multi-node architecture
@@ -17,8 +30,52 @@ This project was built to practice ROS2 system architecture by implementing a co
 
 Many robotics systems must continuously monitor the environment, make decisions based on sensor input, and verify that actions were successfully executed.
 
+## Project Evolution
+- Phase 1: ROS2 Architecture Prototype (Completed)
+   - Multi-node ROS2 architecture
+   - Supervisor state machine
+   - Publisher/subscriber communication
+   - Verification and retry logic
+   - Launch-based orchestration
+   ```text
+   tee_sensor_node
+      ↓
+   feeder_supervisor_node
+      ↓
+   actuator_node
+   ```
+
+- Phase 2: Embedded Hardware Prototype (Current)
+   - ESP32 embedded controller
+   - Microswitch tee sensor
+   - Servo-based dispensing mechanism
+   - Autonomous ball detection
+   - Verification and fault recovery
+   ```text
+   Microswitch
+      ↓
+   ESP32
+      ↓
+   Servo
+      ↓
+   Golf Ball
+   ```
+
+- Phase 3: ROS2 ↔ ESP32 Integration (Planned)
+   - Serial communication between ROS2 and ESP32
+   - High-level ROS2 supervision
+   - Low-level embedded sensing and actuation
+   - System monitoring and diagnostics
+   ```text
+   ROS2 Supervisor
+      ↓ Serial
+   ESP32 Controller
+      ↓
+   Sensor + Servo
+   ```
+
 ## 🧠 System Architecture
-## System Machine
+## State Machine
 1. **Idle State**
    - Ball is present on the tee
  ↓
@@ -87,7 +144,11 @@ ros2 topic pub --once /sim/toggle_ball std_msgs/msg/Empty "{}"
 each time the ball presence state needs to be changed. (First call -> ball removed, second call -> ball placed)
 
 ## Demo
-The example below demonstrates a complete cycle:
+The video below demonstrates the physical function of the system.
+![Physical Prototype](screenshots/physical_prototype.jpg)
+[Video Demonstration](videos/golf_ball_feeder_demo.MOV)
+
+The example below demonstrates a complete cycle in the ROS2 system:
 ball removed → supervisor detects absence → feed command issued → actuator responds → supervisor verifies ball placement.
 
 - Left: tee_sensor_node
@@ -97,10 +158,17 @@ ball removed → supervisor detects absence → feed command issued → actuator
 ![ROS2 Golf Ball Feeder Demo](screenshots/project_demo.png)
 
 ## 🛠 Technologies Used
+### Software
 - ROS2 (rclpy)
 - Python
+- State-machine architecture
 - Publisher/Subscriber communication
-- Timers and event-driven callbacks
+
+### Embedded
+- ESP32
+- Embedded C++
+- ESP32Servo Library
+- Microswitch sensing
 
 ## 💡 Key Takeaways
 - Designed a modular ROS2 system with clear separation of concerns
@@ -108,8 +176,9 @@ ball removed → supervisor detects absence → feed command issued → actuator
 - Built a realistic failure-handling and retry mechanism
 
 ## Project Outcome
-- Successfully implemented a ROS2-based robotic automation system using a multi-node architecture, event-driven execution, supervisory state-machine logic, and feedback-based verification.
-- The project demonstrates a complete sense → decide → act pipeline commonly used in robotics and industrial automation systems.
+- Successfully designed a ROS2-based automation architecture and implemented a corresponding physical ESP32-controlled prototype.
+- Demonstrated sensing, decision-making, actuation, verification, retry logic, and fault recovery in both simulated and physical environments.
+- The project demonstrates a complete Sense → Decide → Act → Verify pipeline commonly used in robotics and industrial automation systems.
 
 ## Lessons Learned
 - Designing state-machine logic is critical for reliable robotic behavior.
@@ -118,6 +187,8 @@ ball removed → supervisor detects absence → feed command issued → actuator
 - Modular node separation improves maintainability and testing.
 
 ## 📈 Future Improvements
-- Integrate real hardware (load cell + servo motor)
+- Integrate ROS2 and ESP32 through serial communication
 - Replace String messages with custom ROS2 message types
+- Add system diagnostics and logging
+- Improve feeder reliability through repeated testing
 - Add visualization (RViz or state topic)

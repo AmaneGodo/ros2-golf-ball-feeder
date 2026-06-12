@@ -8,7 +8,7 @@ const int HOME_POS = 0;
 const int FEED_POS = 90;
 
 const unsigned long DEBOUNCE_MS = 50;
-const unsigned long check_time = 5000;
+const unsigned long check_time = 7000;
 
 int feed_attempt = 0;
 
@@ -45,7 +45,7 @@ void loop()
         Serial.println("FEED_ONE");
 
         servo1.write(FEED_POS);
-        delay(2500);
+        delay(750);
 
         servo1.write(HOME_POS);
 

@@ -30,6 +30,7 @@ setup(
             'tee_sensor_node = ros2_golf_ball_feeder.tee_sensor_node:main',
             'feeder_supervisor_node = ros2_golf_ball_feeder.feeder_supervisor_node:main',
             'actuator_node = ros2_golf_ball_feeder.actuator_node:main',
+            'serial_bridge_node = ros2_golf_ball_feeder.serial_bridge_node:main',
         ],
     },
 )

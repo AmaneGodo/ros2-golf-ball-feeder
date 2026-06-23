@@ -25,6 +25,7 @@ The system demonstrates a complete physical Sense → Decide → Act → Verify 
 - Closed-loop feedback using actuator status and sensor verification
 - Retry logic with failure handling
 - Launch-based execution for full system orchestration
+- If a feed attempt does not result in a ball being detected on the tee, the supervisor automatically retries up to three times before entering a fault state and requesting manual intervention.
 
 ## Engineering Motivation
 This project was built to practice ROS2 system architecture by implementing a complete sensing, supervisory, and actuation pipeline. Although inspired by an automated golf tee feeder, the architecture mirrors common robotics patterns used in industrial automation and autonomous systems.
@@ -131,6 +132,15 @@ ESP32 Firmware
      │
      ▼
 Servo Actuator
+     │
+     ▼
+   DONE
+     │
+     ▼
+serial_bridge_node
+     │
+     ▼
+/feeder/status
 ```
 
 ### Topics
@@ -139,6 +149,7 @@ Servo Actuator
 | `/tee/ball_present` | `Bool`   | Sensor state (ball present or not)   |
 | `/feeder/command`   | `String` | Command to actuator (`FEED_ONE`)     |
 | `/sim/toggle_ball`  | `Empty`  | Simulation trigger for ball state    |
+| `/feeder/status`    | `String` | Actuator feedback (DONE)             |
 
 ## 🚀 Running the System
 ### 1. Build
@@ -148,9 +159,15 @@ source install/setup.bash
 ```
 
 ### 2. Launch
-```bash
-ros2 launch ros2_golf_ball_feeder feeder_system.launch.py
-```
+- Simulation Launch
+   ```bash
+   ros2 launch ros2_golf_ball_feeder feeder_system.launch.py
+   ```
+
+- Hardware Launch
+   ```bash
+   ros2 launch ros2_golf_ball_feeder hardware_feeder.launch.py
+   ```
 
 ### 3.1 Simulation Mode
 Run:
@@ -222,8 +239,9 @@ The final system demonstrates:
 - Modular node separation improves maintainability and testing.
 
 ## 📈 Future Improvements
-- Publish ESP32 feed completion ("DONE") as a ROS2 status topic
 - Replace String commands with custom ROS2 message types
 - Add diagnostics and health monitoring
 - Improve feeder reliability through repeated testing
 - Add RViz visualization or dashboard monitoring
+- Replace USB serial communication with micro-ROS
+- Design and manufacture a dedicated feeder enclosure

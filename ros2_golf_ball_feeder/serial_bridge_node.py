@@ -18,6 +18,8 @@ class SerialBridgeNode(Node):
 
         self.feed_command = self.create_subscription(String, "/feeder/command", self.feed_command_callback, 10)
 
+        self.feed_status = self.create_publisher(String, "/feeder/status", 10)
+
     def read_serial(self):
         line = self.ser.readline().decode(errors="ignore").strip()
 
@@ -32,6 +34,12 @@ class SerialBridgeNode(Node):
             msg.data = False
             self.publisher.publish(msg)
             self.get_logger().info("Published: ball_present = False")
+
+        elif line == "DONE":
+            msg = String()
+            msg.data = "DONE"
+            self.feed_status.publish(msg)
+            self.get_logger().info("Published: feeder_status = DONE")
 
     def feed_command_callback(self, msg):
         command = msg.data.strip()

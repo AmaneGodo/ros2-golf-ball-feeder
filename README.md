@@ -94,8 +94,8 @@ Many robotics systems must continuously monitor the environment, make decisions 
    - If ball is missing for 3 seconds → trigger feed
  ↓
 3. **Actuation**
-   - Actuator simulates servo rotation (90°)
-   - Publishes `"DONE"` after completion
+   - In simulation mode, the actuator node simulates servo rotation and publishes `DONE`
+   - In hardware mode, the ESP32 actuates the physical servo and reports `DONE` through serial
  ↓
 4. **Verification**
    - Supervisor waits for sensor confirmation
@@ -152,6 +152,14 @@ serial_bridge_node
 | `/feeder/status`    | `String` | Actuator feedback (DONE)             |
 
 ## 🚀 Running the System
+
+### Prerequisites
+- ROS2 installed and sourced
+- Python 3
+- colcon
+- pyserial
+- ESP32 connected over USB for hardware mode
+
 ### 1. Build
 ```bash
 colcon build --symlink-install
@@ -174,12 +182,20 @@ Run:
 - tee_sensor_node
 - feeder_supervisor_node
 - actuator_node
+S
+- In a second terminal, source the workspace:
+   ```bash
+   source install/setup.bash
+   ```
 
-Toggle ball state using:
-
-ros2 topic pub --once /sim/toggle_ball std_msgs/msg/Empty "{}"
+   - Then toggle ball state using:
+      ```bash
+      ros2 topic pub --once /sim/toggle_ball std_msgs/msg/Empty "{}"
+      ```
 
 ### 3.2 Hardware Mode
+* Before launching hardware mode, confirm the ESP32 serial port and update the port setting in the serial bridge node if needed.
+
 Run:
 - serial_bridge_node
 - feeder_supervisor_node
